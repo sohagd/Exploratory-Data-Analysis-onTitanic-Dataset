@@ -4,37 +4,27 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
-# Create a folder for saving plots
 os.makedirs("plots", exist_ok=True)
-
-# Load the dataset
 df = pd.read_csv("Titanic-Dataset.csv")
 
-# Basic information
 print("First 5 rows:")
 print(df.head())
-
 print("\nDataset Shape:")
 print(df.shape)
-
 print("\nDataset Information:")
 df.info()
 
-# Check missing values
+
 print("\nMissing Values:")
 print(df.isnull().sum())
 
-# Summary statistics
 print("\nSummary Statistics:")
 print(df.describe())
-
 print("\nMedian:")
 print(df.median(numeric_only=True))
-
 print("\nStandard Deviation:")
 print(df.std(numeric_only=True))
 
-# Check duplicate rows
 print("\nDuplicate Rows:", df.duplicated().sum())
 
 # Select numeric columns (exclude PassengerId)
@@ -65,7 +55,6 @@ for col in numeric_cols:
 
 # Correlation matrix
 correlation = df[numeric_cols].corr()
-
 plt.figure(figsize=(10, 6))
 sns.heatmap(correlation, annot=True, cmap="coolwarm", fmt=".2f")
 plt.title("Correlation Matrix")
@@ -77,7 +66,6 @@ plt.close()
 # Pairplot
 pair_cols = ["Survived", "Pclass", "Age", "Fare"]
 pair_cols = [col for col in pair_cols if col in df.columns]
-
 if len(pair_cols) > 1:
     sns.pairplot(
         df[pair_cols].dropna().sample(
@@ -109,47 +97,36 @@ print(df[numeric_cols].skew())
 if "Survived" in df.columns:
     print("\nSurvival Rate:")
     print(df["Survived"].value_counts(normalize=True) * 100)
-
     if "Sex" in df.columns:
         print("\nSurvival Rate by Gender:")
         print(df.groupby("Sex")["Survived"].mean() * 100)
-
     if "Pclass" in df.columns:
         print("\nSurvival Rate by Passenger Class:")
         print(df.groupby("Pclass")["Survived"].mean() * 100)
 
-
 # 1. Identify outliers using IQR
 print("\n--- Outlier Detection ---")
-
 for col in numeric_cols:
     Q1 = df[col].quantile(0.25)
     Q3 = df[col].quantile(0.75)
     IQR = Q3 - Q1
-
     lower = Q1 - 1.5 * IQR
     upper = Q3 + 1.5 * IQR
-
     outliers = df[(df[col] < lower) | (df[col] > upper)]
-
     print(f"{col}: {len(outliers)} potential outliers")
 
 # 2. Identify survival patterns
 print("\n--- Feature-Level Inferences ---")
-
 if "Survived" in df.columns and "Sex" in df.columns:
     gender_survival = df.groupby("Sex")["Survived"].mean() * 100
     print("\nSurvival rate by gender:")
     print(gender_survival.round(2))
-
     print("Higher survival rate:",
           gender_survival.idxmax())
-
 if "Survived" in df.columns and "Pclass" in df.columns:
     class_survival = df.groupby("Pclass")["Survived"].mean() * 100
     print("\nSurvival rate by passenger class:")
     print(class_survival.round(2))
-
     print("Class with highest survival rate:",
           class_survival.idxmax())
 
@@ -157,7 +134,6 @@ if "Survived" in df.columns and "Pclass" in df.columns:
 if "Age" in df.columns:
     print("\nAge distribution:")
     print(df["Age"].describe())
-
     if "Survived" in df.columns:
         df["Age_Group"] = pd.cut(
             df["Age"],
@@ -165,7 +141,6 @@ if "Age" in df.columns:
             labels=["Child", "Teenager", "Adult",
                     "Middle-aged", "Senior"]
         )
-
         print("\nSurvival rate by age group (%):")
         print(
             (df.groupby("Age_Group", observed=False)["Survived"]
